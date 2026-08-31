@@ -1,0 +1,84 @@
+[package]
+name = "tag"
+version = "0.1.0"
+edition = "2021"
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+description = "Shared tag catalog (Valence platform crate)"
+
+[lints]
+workspace = true
+
+[dependencies]
+leptos = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+async-trait = { workspace = true, optional = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+log = { workspace = true }
+
+valence = { workspace = true, optional = true }
+record-history = { workspace = true, optional = true }
+lepton-identity = { workspace = true, optional = true }
+uf-search-core = { workspace = true, default-features = false }
+orbital-macros = { workspace = true }
+uf-product-macros = { workspace = true }
+inventory = { workspace = true }
+quark = { workspace = true, optional = true }
+higgs = { workspace = true, optional = true }
+
+[build-dependencies]
+valence-codegen = { workspace = true }
+
+[features]
+default = []
+db-sqlite = ["valence/sqlite"]
+db-hybrid = ["valence/hybrid"]
+ssr = [
+    "leptos/ssr",
+    "dep:async-trait",
+    "dep:valence",
+    "db-sqlite",
+    "dep:record-history",
+    "record-history/ssr",
+    "dep:lepton-identity",
+    "dep:quark",
+    "dep:higgs",
+    "higgs/ssr",
+    "uf-search-core/ssr"]
+
+[dev-dependencies]
+tokio = { workspace = true }
+lepton-identity = { workspace = true }
+# record-history intentionally NOT in dev-deps: as a dev-dependency it would be
+# built featureless (it only compiles with `ssr`) and enabling `ssr` here would
+# poison the workspace build with `leptos/ssr` via feature unification. The
+# integration tests gate on this crate's `ssr` feature (required-features),
+# which activates the optional record-history regular dependency instead.
+
+[[test]]
+name = "workspace_members"
+
+[[test]]
+name = "product_surface"
+
+[[test]]
+name = "tag_service_integration"
+required-features = ["ssr"]
+
+[[test]]
+name = "tag_crud_contract"
+required-features = ["ssr"]
+
+[[test]]
+name = "privacy_policy_integration"
+required-features = ["ssr"]
+
+[[test]]
+name = "helpers"
+required-features = ["ssr"]
