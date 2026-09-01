@@ -1,0 +1,83 @@
+# PR / merge gate aligned with docs/VERIFICATION.md.
+# Standalone checkout — UF deps resolve via git branch = main on unified-field-dev.
+# tag-app / Playwright stay local (see VERIFICATION.md Layer 2).
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_BUILD_JOBS: 1
+  CARGO_TARGET_DIR: target-tag
+  CARGO_INCREMENTAL: 0
+  CARGO_PROFILE_DEV_DEBUG: "0"
+  RUST_BACKTRACE: 1
+  # Leptos workspace deps enable the `nightly` feature.
+  RUSTFLAGS: "-D warnings"
+
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c # master (pin)
+        with:
+          # Pin: floating tip breaks diskann-wide (surrealdb-core) with E0283.
+          toolchain: nightly-2026-08-07
+          components: rustfmt
+      - name: cargo fmt --check
+        run: cargo fmt -p tag -p protected-tag-host -- --check
+
+  clippy:
+    runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: ""
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c # master (pin)
+        with:
+          toolchain: nightly-2026-08-07
+          components: clippy
+      # VERIFICATION.md preferred path: --all-targets on tag (not tag-app).
+      - name: cargo clippy (tag all-targets + ssr)
+        run: cargo clippy -p tag --all-targets --features ssr -- -D warnings
+      - name: cargo clippy (protected-tag-host)
+        run: cargo clippy -p protected-tag-host --all-targets -- -D warnings
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c # master (pin)
+        with:
+          toolchain: nightly-2026-08-07
+      - name: cargo test (workspace + product_surface needles)
+        run: cargo test -p tag --test workspace_members --test product_surface
+      - name: cargo test (tag domain contracts)
+        run: >
+          cargo test -p tag --features ssr
+          --test tag_crud_contract
+          --test tag_service_integration
+          --test privacy_policy_integration
+      - name: cargo check + run (protected-tag-host)
+        run: |
+          cargo check -p protected-tag-host
+          cargo run -p protected-tag-host
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c # master (pin)
+        with:
+          toolchain: nightly-2026-08-07
+      - name: cargo doc (tag, deny broken intra-doc links)
+        env:
+          RUSTDOCFLAGS: "-D rustdoc::broken-intra-doc-links"
+        run: cargo doc -p tag --features ssr --no-deps

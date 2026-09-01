@@ -1,0 +1,21 @@
+[package]
+name = "protected-tag-host"
+version = "0.1.0"
+edition = "2021"
+publish = false
+license = "MIT"
+description = "Teaching host: /tag deny/allow + catalog create/list + ManyToMany inventory contract"
+
+[lints]
+workspace = true
+
+[dependencies]
+axum = { workspace = true, default-features = false, features = ["tokio", "http1", "json"] }
+chrono = { workspace = true }
+http-body-util = "0.1"
+lepton-identity = { workspace = true }
+serde_json = { workspace = true }
+tag = { path = "../../tag", features = ["ssr"] }
+tokio = { workspace = true }
+tower = { version = "0.5", features = ["util"] }
+valence = { workspace = true }

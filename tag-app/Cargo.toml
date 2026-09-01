@@ -1,0 +1,70 @@
+[package]
+name = "tag-app"
+version = "0.1.0"
+edition = "2021"
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+description = "Orbital /tag admin UI and TagCatalogPicker for the shared tag catalog"
+
+[lints]
+workspace = true
+
+[dependencies]
+leptos = { workspace = true }
+leptos_meta = { workspace = true }
+leptos_router = { workspace = true }
+leptos_axum = { workspace = true, optional = true }
+
+icondata = { workspace = true }
+
+thiserror = { workspace = true }
+
+chrono = { workspace = true }
+tracing = { workspace = true }
+
+# Non-optional: `valence::RecordId` is part of the featureless/hydrate API surface
+# (HistoryTimeline props on the tag detail page).
+valence = { workspace = true }
+uf-product = { workspace = true, default-features = false }
+uf-integrations = { workspace = true, default-features = false }
+lepton-shell = { workspace = true, default-features = false }
+orbital-theme = { workspace = true, default-features = false }
+orbital-macros = { workspace = true }
+uf-product-macros = { workspace = true }
+higgs = { workspace = true, optional = true }
+tag = { workspace = true }
+record-history-leptos = { workspace = true, default-features = false }
+uf-search-core = { workspace = true, default-features = false }
+
+[features]
+default = []
+preview = ["uf-product/preview", "record-history-leptos/preview"]
+hydrate = [
+    "leptos/hydrate",
+    "uf-product/hydrate",
+    "uf-integrations/hydrate",
+    "orbital-theme/hydrate",
+    "lepton-shell/hydrate",
+    "record-history-leptos/hydrate"]
+ssr = [
+    "leptos/ssr",
+    "leptos_meta/ssr",
+    "leptos_router/ssr",
+    "dep:leptos_axum",
+    "dep:higgs",
+    "higgs/ssr",
+    "uf-product/ssr",
+    "uf-integrations/ssr",
+    "orbital-theme/ssr",
+    "lepton-shell/ssr",
+    "tag/ssr",
+    "tag/db-sqlite",
+    "valence/sqlite",
+    "record-history-leptos/ssr",
+    "uf-search-core/ssr"]
+
+[lib]
+path = "src/lib.rs"

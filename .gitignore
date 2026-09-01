@@ -1,0 +1,11 @@
+/target-gauge-extract/
+/target/
+**/*.rs.bk
+target/
+target-*/
+**/CACHEDIR.TAG
+**/.rustc_info.json
+**/node_modules/
+**/test-results/
+**/playwright-report/
+examples/tag-ui-e2e/site/pkg/
