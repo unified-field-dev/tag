@@ -4,7 +4,7 @@ use chrono::{DateTime, Utc};
 use leptos::prelude::*;
 use leptos_router::components::A;
 use tag::types::TagRowDto;
-use uf_product::primitives::{
+use uf_product::components::{
     Button, ButtonAppearance, Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow,
 };
 

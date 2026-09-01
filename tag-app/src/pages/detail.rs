@@ -9,8 +9,9 @@ use leptos_router::NavigateOptions;
 use record_history_leptos::HistoryTimeline;
 use tag::types::{TagDetailDto, TagUpdateInput};
 use uf_product::components::{
-    Body1, Button, ButtonAppearance, Caption1, Card, ContentContainer, Field, Flex, FlexAlign,
-    FlexGap, FlexJustify, Input, MessageBar, MessageBarIntent, SpacingSize, Textarea, Title3,
+    Button, ButtonAppearance, Caption1, Card, ContentContainer, Field, Flex, FlexAlign, FlexGap,
+    FlexJustify, Input, MessageBar, MessageBarIntent, Skeleton, SkeletonItem, SpacingSize,
+    Textarea, Title3,
 };
 use valence::RecordId;
 
@@ -31,6 +32,38 @@ fn history_timeline(source: RecordId) -> impl IntoView {
 
 #[cfg(not(any(feature = "hydrate", feature = "ssr")))]
 fn history_timeline(_source: RecordId) -> impl IntoView {}
+
+/// Placeholder while tag detail loads.
+#[component]
+fn TagDetailSkeleton() -> impl IntoView {
+    view! {
+        <Flex vertical=true gap=FlexGap::Medium>
+            <Card>
+                <Flex vertical=true gap=FlexGap::Small padding=SpacingSize::Size200.inset()>
+                    <Skeleton>
+                        <SkeletonItem width="30%".to_string() height="20px".to_string() />
+                    </Skeleton>
+                    <Skeleton>
+                        <SkeletonItem width="50%".to_string() height="32px".to_string() />
+                    </Skeleton>
+                </Flex>
+            </Card>
+            <Card>
+                <Flex vertical=true gap=FlexGap::Medium padding=SpacingSize::Size200.inset()>
+                    <Skeleton>
+                        <SkeletonItem width="100%".to_string() height="40px".to_string() />
+                    </Skeleton>
+                    <Skeleton>
+                        <SkeletonItem width="100%".to_string() height="40px".to_string() />
+                    </Skeleton>
+                    <Skeleton>
+                        <SkeletonItem width="100%".to_string() height="120px".to_string() />
+                    </Skeleton>
+                </Flex>
+            </Card>
+        </Flex>
+    }
+}
 
 #[component]
 fn TagDetailEditor(row: TagDetailDto, tag_id: String, refresh: RwSignal<u32>) -> impl IntoView {
@@ -192,7 +225,7 @@ pub fn TagDetailPage() -> impl IntoView {
 
     view! {
         <ContentContainer max_width="900px" data_testid="tag-detail-page">
-            <Transition fallback=move || view! { <Body1>"Loading tag..."</Body1> }>
+            <Transition fallback=move || view! { <TagDetailSkeleton /> }>
                 {move || {
                     let id = tag_id.get();
                     if id.trim().is_empty() {
@@ -202,7 +235,7 @@ pub fn TagDetailPage() -> impl IntoView {
                         .into_any();
                     }
                     match detail.get() {
-                        None => view! { <Body1>"Loading tag..."</Body1> }.into_any(),
+                        None => view! { <TagDetailSkeleton /> }.into_any(),
                         Some(Err(err)) => view! {
                             <MessageBar intent=MessageBarIntent::Error>{err.to_string()}</MessageBar>
                         }.into_any(),

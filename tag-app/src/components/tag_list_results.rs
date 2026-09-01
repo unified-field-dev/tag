@@ -4,11 +4,32 @@ use leptos::prelude::*;
 use leptos_router::components::A;
 use tag::types::TagRowDto;
 use uf_product::components::{
-    Body1, Button, ButtonAppearance, EmptyState, Flex, FlexGap, FlexJustify, MessageBar,
-    MessageBarIntent, SpacingSize,
+    Button, ButtonAppearance, EmptyState, Flex, FlexGap, FlexJustify, MessageBar, MessageBarIntent,
+    Skeleton, SkeletonItem, SpacingSize,
 };
 
 use crate::components::TagListTable;
+
+/// Placeholder rows while the tag catalog loads.
+#[component]
+fn TagListSkeleton() -> impl IntoView {
+    view! {
+        <Flex vertical=true gap=FlexGap::Small padding=SpacingSize::Size200.inset()>
+            <Skeleton>
+                <SkeletonItem width="100%".to_string() height="40px".to_string() />
+            </Skeleton>
+            <Skeleton>
+                <SkeletonItem width="100%".to_string() height="40px".to_string() />
+            </Skeleton>
+            <Skeleton>
+                <SkeletonItem width="100%".to_string() height="40px".to_string() />
+            </Skeleton>
+            <Skeleton>
+                <SkeletonItem width="100%".to_string() height="40px".to_string() />
+            </Skeleton>
+        </Flex>
+    }
+}
 
 /// Transition body for the tag list card.
 #[component]
@@ -18,17 +39,9 @@ pub(crate) fn TagListResults(
     on_clear: Callback<()>,
 ) -> impl IntoView {
     view! {
-        <Transition fallback=move || view! {
-            <Flex padding=SpacingSize::Size200.inset()>
-                <Body1>"Loading tags..."</Body1>
-            </Flex>
-        }>
+        <Transition fallback=move || view! { <TagListSkeleton /> }>
             {move || match tags.get() {
-                None => view! {
-                    <Flex padding=SpacingSize::Size200.inset()>
-                        <Body1>"Loading tags..."</Body1>
-                    </Flex>
-                }.into_any(),
+                None => view! { <TagListSkeleton /> }.into_any(),
                 Some(Err(err)) => view! {
                     <Flex padding=SpacingSize::Size200.inset()>
                         <MessageBar intent=MessageBarIntent::Error>{err.to_string()}</MessageBar>
