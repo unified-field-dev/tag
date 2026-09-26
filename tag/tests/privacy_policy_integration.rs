@@ -167,7 +167,7 @@ async fn tag_history_update_non_owner_denied_sad() {
         "tag_history",
         &hist_id,
         &system,
-        valence::use_!(r#"**Test:** Fixture row load for `privacy_policy_integration` so the suite can assert Valence privacy policy allow and deny outcomes. CI and developers running the suite only."#),
+        valence::use_!(r"**Test:** Fixture row load for `privacy_policy_integration` so the suite can assert Valence privacy policy allow and deny outcomes. CI and developers running the suite only."),
     )
     .await
     .expect("get")
